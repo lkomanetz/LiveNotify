@@ -1,5 +1,5 @@
 var cookieName = "livestream_message";
-var intervalTime = 5000; // 2 seconds
+var intervalTime = 5000; // 5 seconds
 var userHandle = "Logan";
 var highlightColor = "#ff5c33";
 var shoulderTapRegex = /@[A-Za-z0-9]+/g;
@@ -22,6 +22,7 @@ function highlightShoulderTaps(messages) {
             continue;
         }
         
+	// TODO(Logan): Remove hard coded handle in favor of a data driven value.
         for (var j = 0; j < matches.length; j++) {
             if (matches[i].indexOf(userHandle) > -1) {
                 var newSpan = createSpanElement(matches[j]);
