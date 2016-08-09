@@ -1,0 +1,16 @@
+{
+	"manifest_version": 2,
+    "name": "LiveNotify",
+    "description": "Sends desktop notifications when somebody mentions you during chat.",
+    "version": "1.0",
+    "permissions": [
+        "notifications",
+        "storage"
+    ],
+    "web_accessible_resources": ["clientScript.js"],
+    "content_scripts": [{
+        "matches": ["*://*.livestream.com/*"],
+        "js": ["contentScript.js"],
+        "run_at": "document_idle"
+    }]
+}
