@@ -2,7 +2,7 @@ var cookieName = "livestream_message";
 var intervalTime = 5000; // 5 seconds
 var userHandle = "Logan";
 var highlightColor = "#ff5c33";
-var shoulderTapRegex = /@[A-Za-z0-9]+/g;
+var shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
 
 var intervalHandle = setInterval(function() {
     var messages = getChatMessages();
@@ -18,17 +18,17 @@ function highlightShoulderTaps(messages) {
         var messageContent = messages[i].getElementsByClassName("content")[0];
         var matches = shoulderTapRegex.exec(messageContent.innerHTML);
         
-        if (matches == null) {
+        if (matches == null || matches == "undefined") {
             continue;
         }
         
 	// TODO(Logan): Remove hard coded handle in favor of a data driven value.
         for (var j = 0; j < matches.length; j++) {
-            if (matches[i].indexOf(userHandle) > -1) {
-                var newSpan = createSpanElement(matches[j]);
-                var newHtml = messages[i].innerHTML.replace(matches[j], newSpan);
-                messages[i].innerHTML = newHtml;
-            }
+	    if (matches[j].indexOf(userHandle) !== -1) {
+		var newSpan = createSpanElement(matches[j]);
+		var newHtml = messages[i].innerHTML.replace(matches[j], newSpan);
+		messages[i].innerHTML = newHtml;
+	    }
         }
     }
 }
