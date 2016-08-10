@@ -7,7 +7,6 @@
         "notifications",
         "storage"
     ],
-    "web_accessible_resources": ["clientScript.js"],
     "content_scripts": [{
         "matches": ["*://*.livestream.com/*"],
         "js": ["contentScript.js"],
