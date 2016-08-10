@@ -1,4 +1,3 @@
-var cookieName = "livestream_message";
 var intervalTime = 1000; // 1 second
 var userHandle = "Logan";
 var highlightColor = "#ff5c33";
