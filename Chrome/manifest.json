@@ -7,6 +7,11 @@
         "notifications",
         "storage"
     ],
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
     "content_scripts": [{
         "matches": ["*://*.livestream.com/*"],
         "js": ["contentScript.js"],

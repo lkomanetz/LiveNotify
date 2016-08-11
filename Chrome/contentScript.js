@@ -4,49 +4,85 @@ var maxTimeoutThresholdInHours = 1;
 var userHandle = "Logan";
 var highlightColor = "#ff5c33";
 var shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
+var lastProcessedMessage = null;
 var highlightedMessages = [];
-var usersChatting = [];
+var intervalHandle = null;
 
-//TODO(Logan): I only want to retrive the messages that haven't been processed yet.
-var intervalHandle = setInterval(function() {
-    var messages = getChatMessages();
-    highlightShoulderTaps(messages);
-}, intervalTime);
+window.onunload = function() {
+    clearInterval(intervalHandle);
+    lastProcessedMessage = null;
+    highlightedMessages = [];
+}
 
-var cleanupIntervalHandle = setInterval(function() {
-    cleanupActiveUsers();
-}, cleanupIntervalTime);
+setTimeout(main, 3000);
+
+function main() {
+    intervalHandle = setInterval(function() {
+        var messages = getChatMessages();
+        process(messages);
+    }, intervalTime);
+}
 
 function getChatMessages() {
     return document.getElementById("chat_messages").childNodes;
 }
 
-function highlightShoulderTaps(messages) {
-    for (var i = 0; i < messages.length; i++) {
-        var messageContent = messages[i].getElementsByClassName("content")[0];
-        var matches = messageContent.innerHTML.match(shoulderTapRegex);
-        
-        if (matches == null ||
-            matches == "undefined" ||
-            matches.length == 0) {
-            
-            continue;
-        }
-        
-        if (hasMessageBeenHighlighted(messages[i])) {
-            continue;
-        }
-        
-        var newHtml = messages[i].innerHTML.replace(shoulderTapRegex, createSpanElement);
-        messages[i].innerHTML = newHtml;
-        
-        var msg = new Message();
-        msg.sentBy = messages[i].getElementsByClassName("user_link")[0].title;
-        msg.sentOn = new Date(messages[i].getElementsByClassName("timeago")[0].title);
-        
-        highlightedMessages.unshift(msg);
-        sendNotification(highlightedMessages[0]);
+function highlightShoulderTaps(message) {
+    var messageContent = message.getElementsByClassName("content")[0];
+    
+    if (hasMessageBeenHighlighted(message)) {
+        return;
     }
+    
+    var newHtml = message.innerHTML.replace(shoulderTapRegex, createSpanElement);
+    message.innerHTML = newHtml;
+    
+    var msg = {
+        sentBy: message.getElementsByClassName("user_link")[0].title,
+        sentOn: new Date(message.getElementsByClassName("timeago")[0].title)
+    };
+    
+    highlightedMessages.unshift(msg);
+}
+
+function hasShoulderTaps(message) {
+    var messageContent = message.getElementsByClassName("content")[0];
+    var matches = messageContent.innerHTML.match(shoulderTapRegex);
+    
+    if (matches == null ||
+       matches == "undefined" ||
+       matches.length == 0) {
+        
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+function process(messages) {
+    var index = findIndexOf(lastProcessedMessage, messages);
+    if (index === -1) {
+        index = messages.length;
+    }
+    
+    for (var i = index - 1; i >= 0; i--) {
+        if (hasShoulderTaps(messages[i])) {
+            highlightShoulderTaps(messages[i]);
+            sendShoulderTappedEvent(messages[i]);
+        }
+        
+        lastProcessedMessage = {
+            sentBy: messages[i].getElementsByClassName("user_link")[0].title,
+            sentOn: new Date(messages[i].getElementsByClassName("timeago")[0].title)
+        }
+    }
+}
+
+function sendShoulderTappedEvent(message) {
+    document.dispatchEvent(new CustomEvent("LiveNotify_ShoulderTapped", {
+        detail: message
+    }));
 }
 
 function createSpanElement(match) {
@@ -58,6 +94,23 @@ function createSpanElement(match) {
     }
     
     return elem;
+}
+
+function findIndexOf(msg, nodes) {
+    if (msg == null) {
+        return -1;
+    }
+    
+    for (var i = 0; i < nodes.length; i++) {
+        var sentBy = nodes[i].getElementsByClassName("user_link")[0].title;
+        var sentOn = new Date(nodes[i].getElementsByClassName("timeago")[0].title);
+        
+        if (msg.sentBy === sentBy && msg.sentOn.getTime() === sentOn.getTime()) {
+            return i;
+        }
+    }
+    
+    return -1;
 }
 
 function hasMessageBeenHighlighted(message) {
@@ -77,68 +130,4 @@ function hasMessageBeenHighlighted(message) {
     }
     
     return true;
-}
-
-function sendNotification(message) {
-    /*
-    chrome.notifications.create("livenotify.notification", {
-        title: "LiveNotify",
-        type: "basic",
-        priority: 2,
-        message: message.sentBy + " has tapped you."
-    }, function() {});
-    */
-}
-
-function buildUserChattingArray(messages) {
-    for (var i = 0; i < messages.length; i++) {
-        var user = new User();
-        user.name = messages[i].getElementsByClassName("user_link")[0].title;
-        user.lastMessageSentOn = new Date(messages[i].getElementsByClassName("timeago")[0].title);
-        
-        if (!doesUserExist(user)) {
-            usersChatting.push(user);
-        }
-    }
-}
-
-function cleanupActiveUsers() {
-    for (var i = 0; i < usersChatting.length; i++) {
-        if (!isUserActive(usersChatting[i])) {
-            usersChatting.splice(i, 1);
-        }
-    }
-}
-
-function doesUserExist(user) {
-    var foundItems = usersChatting.filter(function(item) {
-        return item.name === user.name;
-    });
-    
-    if (foundItems.length === 1) {
-        return true;
-    }
-    else {
-        return false;        
-    }
-}
-
-function isUserActive(user) {
-    var now = new Date();
-    var utcNow = new Date(now.toUTCString());
-    var differenceInMilliseconds = Math.abs(utcNow - user.lastMessageSentOn);
-    var differenceInHours = (differenceInMilliseconds / (60 * 60 * 1000));
-    
-    var isActive = (differenceInHours < maxTimeoutThresholdInHours) ? true : false;
-    return isActive;
-}
-
-function User() {
-    this.name;
-    this.lastMessageSentOn;
-}
-
-function Message() {
-    this.sentBy;
-    this.sentOn;
 }
