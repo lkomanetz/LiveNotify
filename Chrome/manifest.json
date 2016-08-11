@@ -5,7 +5,8 @@
     "version": "1.0",
     "permissions": [
         "notifications",
-        "storage"
+        "storage",
+        "tabs"
     ],
     "background": {
         "scripts": [
@@ -14,7 +15,10 @@
     },
     "content_scripts": [{
         "matches": ["*://*.livestream.com/*"],
-        "js": ["contentScript.js"],
+        "js": [
+            "contentScript.js",
+            "messageProcessor.js"
+        ],
         "run_at": "document_end"
     }]
 }
