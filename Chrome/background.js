@@ -1,9 +1,5 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (!isLivestreamActive) {
-        return;
-    }
-    
-    whenLivestreamActive(function() {
+    whenLivestreamNotActive(function() {
         chrome.notifications.create("LiveNotify_ShoulderTap", {
             type: "basic",
             iconUrl: "exclamation_point.ico",
@@ -15,29 +11,59 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 chrome.notifications.onClicked.addListener(function(notificationId) {
-    chrome.tabs.query({url: "*://livestream.com/*"}, function(tabs) {
-        if (tabs[0] !== undefined) {
-            openLivestream(tabs[0].id);
-            clearNotification(notificationId);
-        }
+    withLivestreamWindow(function(windowId, tabId) {
+        openLivestream(windowId, tabId);
+        clearNotification(notificationId);
     });
 });
 
-function whenLivestreamActive(sendNotificationAction) {
-    chrome.tabs.query({lastFocusedWindow: true, active: true}, function(tabs) {
-        var index = tabs[0].url.indexOf("livestream");
-        isActive = index > -1;
-        
-        if (!isActive) {
-            sendNotificationAction();
+function whenLivestreamNotActive(sendNotificationAction) {
+    chrome.windows.getAll({populate: true}, function(windows) {
+        for (var i = 0; i < windows.length; i++) {
+            for (var j = 0; j < windows[i].tabs.length; j++) {
+                if (windows[i].tabs[j].url.indexOf("livestream") !== -1 &&
+                    windows[i].state === "minimized" ||
+                    windows[i].focused === false) {
+                    
+                    sendNotificationAction();
+                }
+            }
         }
     });
 }
 
-function openLivestream(tabId) {
-    chrome.tabs.update(tabId, {selected: true});
+function openLivestream(windowId, tabId) {
+    chrome.windows.update(windowId, {
+        focused: true,
+        state: "maximized"
+    }, function(window) {
+        chrome.tabs.update(tabId, {
+            active: true
+        });
+    });
 }
 
 function clearNotification(notificationId) {
     chrome.notifications.clear(notificationId);
+}
+
+function withLivestreamWindow(callbackAction) {
+    chrome.windows.getAll({populate: true}, function(windows) {
+        var windowId = -1;
+        var tabId = -1;
+        for (var i = 0; i < windows.length; i++) {
+            for (var j = 0; j < windows[i].tabs.length; j++) {
+                if (windows[i].tabs[j].url.indexOf("livestream") !== -1) {
+                    tabId = windows[i].tabs[j].id;
+                    windowId = windows[i].id;
+                    break;
+                }
+            }
+            
+            if (windowId !== -1) {
+                callbackAction(windowId, tabId);
+                break;
+            }
+        }
+    });
 }
