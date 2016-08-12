@@ -1,3 +1,5 @@
+//TODO(Logan):  Re-structure the background script for maintenance reasons
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     whenLivestreamNotActive(function() {
         chrome.notifications.create("LiveNotify_ShoulderTap", {
@@ -14,6 +16,24 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     withLivestreamWindow(function(windowId, tabId) {
         openLivestream(windowId, tabId);
         clearNotification(notificationId);
+    });
+});
+
+/*
+ * Registers the page action only for a tab that has "livestream" in the URL
+ */
+chrome.runtime.onInstalled.addListener(function() {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+        chrome.declarativeContent.onPageChanged.addRules([{
+            conditions: [
+                new chrome.declarativeContent.PageStateMatcher({
+                    pageUrl: { urlContains: "livestream" }
+                })
+            ],
+            actions: [
+                new chrome.declarativeContent.ShowPageAction()
+            ]
+        }]);
     });
 });
 
