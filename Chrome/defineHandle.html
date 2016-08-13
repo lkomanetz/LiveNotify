@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="libraries/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="libraries/bootstrap/css/bootstrap-theme.min.css" />
     <script src="libraries/js/jquery-3.1.0.min.js"></script>
+    <script src="defineHandle.js"></script>
+    <style>
+        body {
+            width: 350px;
+        }
+    </style>
 </head>
 <body>
-    <table>
-        <tr>
-            @<input type="text" data-bind="text: name"/>
-        </tr>
-    </table>
-    <script src="defineHandle.js"></script>
+    <div class="container-fluid">
+        <form>
+            <div class="row">
+                <div class="col-xs-6">
+                    <label for="lblCurrentHandle">Current Handle:</label>
+                </div>
+                <div class="col-xs-6">
+                    <label id="lblCurrentHandle">TestHandle</label> 
+                </div>
+            </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-xs-12">
+                    <input type="text" class="form-control" id="txtHandle" placeholder="New Handle" />
+                </div>
+            </div>
+            <button onclick="setHandle()" id="btnApply" class="btn btn-default">Apply</button>
+        </form>
+    </div>
 </body>
 </html>
