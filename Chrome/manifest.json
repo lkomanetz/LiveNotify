@@ -9,22 +9,31 @@
         "tabs",
         "declarativeContent"
     ],
+    "icons": {
+        "16": "icons/exclamation_mark.png",
+        "48": "icons/exclamation_mark.png",
+        "128": "icons/exclamation_mark.png"
+    },
     "background": {
         "scripts": [
-            "background.js"
+            "services/pageActionService.js",
+            "services/notificationService.js"
         ]
     },
     "content_scripts": [{
         "matches": ["*://*.livestream.com/*"],
         "js": [
-            "contentScript.js",
-            "messageProcessor.js"
+            "main.js",
+            "processors/messageProcessor.js"
         ],
         "run_at": "document_end"
     }],
     "page_action": {
         "default_title": "LiveNotify",
-        "default_icon": "exclamation_point.ico",
-        "default_popup": "defineHandle.html"
+        "default_icon": {
+            "19": "icons/exclamation_mark.png",
+            "38": "icons/exclamation_mark.png"
+        },
+        "default_popup": "pageActions/defineHandle.html"
     }
 }

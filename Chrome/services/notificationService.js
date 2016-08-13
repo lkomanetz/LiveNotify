@@ -1,10 +1,8 @@
-//TODO(Logan):  Re-structure the background script for maintenance reasons
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     whenLivestreamNotActive(function() {
         chrome.notifications.create("LiveNotify_ShoulderTap", {
             type: "basic",
-            iconUrl: "exclamation_point.ico",
+            iconUrl: "icons/exclamation_point.ico",
             title: "LiveNotify",
             message: request.detail,
             isClickable: true
@@ -19,31 +17,15 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     });
 });
 
-/*
- * Registers the page action only for a tab that has "livestream" in the URL
- */
-chrome.runtime.onInstalled.addListener(function() {
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-        chrome.declarativeContent.onPageChanged.addRules([{
-            conditions: [
-                new chrome.declarativeContent.PageStateMatcher({
-                    pageUrl: { urlContains: "livestream" }
-                })
-            ],
-            actions: [
-                new chrome.declarativeContent.ShowPageAction()
-            ]
-        }]);
-    });
-});
-
 function whenLivestreamNotActive(sendNotificationAction) {
     chrome.windows.getAll({populate: true}, function(windows) {
         for (var i = 0; i < windows.length; i++) {
-            for (var j = 0; j < windows[i].tabs.length; j++) {
-                if (windows[i].tabs[j].url.indexOf("livestream") !== -1 &&
-                    windows[i].state === "minimized" ||
-                    windows[i].focused === false) {
+            var hwnd = windows[i];
+            for (var j = 0; j < hwnd.tabs.length; j++) {
+                var tab = hwnd.tabs[j];
+                if ((tab.active &&
+                    tab.url.indexOf("livestream") === -1) ||
+                    hwnd.state === "minimized") {
                     
                     sendNotificationAction();
                 }
