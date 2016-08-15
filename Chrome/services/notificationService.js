@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    whenLivestreamNotActive(function() {
+    doWhenLivestreamNotActive(function() {
         chrome.notifications.create("LiveNotify_ShoulderTap", {
             type: "basic",
             iconUrl: "icons/exclamation_point.ico",
@@ -11,25 +11,32 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 });
 
 chrome.notifications.onClicked.addListener(function(notificationId) {
-    withLivestreamWindow(function(windowId, tabId) {
+    doWithLivestreamWindow(function(windowId, tabId) {
         openLivestream(windowId, tabId);
         clearNotification(notificationId);
     });
 });
 
-function whenLivestreamNotActive(sendNotificationAction) {
+function doWhenLivestreamNotActive(sendNotificationAction) {
     chrome.windows.getAll({populate: true}, function(windows) {
+        var livestreamTab = null;
+        var livestreamWindow = null;
+        
         for (var i = 0; i < windows.length; i++) {
-            var hwnd = windows[i];
-            for (var j = 0; j < hwnd.tabs.length; j++) {
-                var tab = hwnd.tabs[j];
-                if ((tab.active &&
-                    tab.url.indexOf("livestream") === -1) ||
-                    hwnd.state === "minimized") {
-                    
-                    sendNotificationAction();
+            for (var j = 0; j < windows[i].tabs.length; j++) {
+                if (windows[i].tabs[j].url.indexOf("livestream") !== -1) {
+                    livestreamTab = windows[i].tabs[j];
+                    livestreamWindow = windows[i];
                 }
             }
+        }
+        
+        if (livestreamWindow == null) {
+            return;
+        }
+        
+        if (!livestreamTab.active || livestreamWindow.state === "minimized") {
+            sendNotificationAction();
         }
     });
 }
@@ -49,7 +56,7 @@ function clearNotification(notificationId) {
     chrome.notifications.clear(notificationId);
 }
 
-function withLivestreamWindow(callbackAction) {
+function doWithLivestreamWindow(callbackAction) {
     chrome.windows.getAll({populate: true}, function(windows) {
         var windowId = -1;
         var tabId = -1;
