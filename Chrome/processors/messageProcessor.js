@@ -75,8 +75,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
         var elem = match;
         
         if (match.indexOf(userHandle) !== -1) {
-            // elem = "<span style='color:#000000;background-color:#b80000;font-weight:800;border-radius:2px'>" + match + "</span>";
-	    elem = "<span class='label label-danger'>" + match + "</span>";
+            elem = "<span class='label label-danger'>" + match + "</span>";
             processorContext.sendShoulderTappedEvent(message);
         }
 
