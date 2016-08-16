@@ -26,6 +26,7 @@
             "main.js",
             "processors/messageProcessor.js"
         ],
+        "css": ["css/liveNotify.css"],
         "run_at": "document_end"
     }],
     "page_action": {
