@@ -1,4 +1,5 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    console.log(request);
     doWhenLivestreamNotActive(function() {
         chrome.notifications.create("LiveNotify_ShoulderTap", {
             type: "basic",

@@ -60,10 +60,15 @@ MessageProcessor.prototype.hasShoulderTaps = function(message) {
 };
 
 MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
+    var shoulderTap = {
+        sentBy: message.getElementsByClassName("user_link")[0].title,
+        sentOn: new Date(message.getElementsByClassName("timeago")[0].title),
+        content: message.getElementsByClassName("content")[0].innerText
+    };
     var sentBy = message.getElementsByClassName("user_link")[0].title;
     var notificationMsg = sentBy + " just tapped you.\n";
     
-    chrome.runtime.sendMessage({detail: notificationMsg}, function(response) {
+    chrome.runtime.sendMessage({detail: notificationMsg, message: shoulderTap}, function(response) {
         // console.log(response.detail);
     });
 };
