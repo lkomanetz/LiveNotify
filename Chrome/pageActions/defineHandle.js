@@ -1,6 +1,7 @@
 var btnApply = null;
 var lblCurrentHandle = null;
 var txtHandle = null;
+var shoulderTapsToAcknowledge = [];
 
 document.addEventListener("DOMContentLoaded", defineHandle_WindowLoaded);
 
@@ -21,4 +22,3 @@ function btnApply_Clicked() {
         lblCurrentHandle.innerText = txtHandle.value;
     });
 }
-

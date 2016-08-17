@@ -1,12 +1,13 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    console.log(request);
     doWhenLivestreamNotActive(function() {
-        chrome.notifications.create("LiveNotify_ShoulderTap", {
+        chrome.notifications.create(undefined, {
             type: "basic",
             iconUrl: "icons/exclamation_point.ico",
             title: "LiveNotify",
-            message: request.detail,
+            message: request.shoulderTap.sentBy + " just tapped you.",
             isClickable: true
+        }, function(notificationId) {
+            addShoulderTapToAcknowledgeList(notificationId, request.shoulderTap);
         });
     });
 });
@@ -17,6 +18,15 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
         clearNotification(notificationId);
     });
 });
+
+function addShoulderTapToAcknowledgeList(notificationId, shoulderTap) {
+    var obj = {
+        notificationId: notificationId,
+        shoulderTap: shoulderTap
+    };
+    
+    chrome.storage.sync.set({"shoulderTapsToAcknowledge": obj});
+}
 
 function doWhenLivestreamNotActive(sendNotificationAction) {
     chrome.windows.getAll({populate: true}, function(windows) {

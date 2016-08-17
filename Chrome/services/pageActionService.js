@@ -1,6 +1,3 @@
-chrome.storage.sync.get("liveNotifyHandle", function(storageItem) {
-    console.log(storageItem);    
-});
 
 /*
  * Registers the page action only for a tab that has "livestream" in the URL
