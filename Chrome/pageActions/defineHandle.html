@@ -7,33 +7,31 @@
     <style>
         body {
             width: 250px;
+            margin: 5px;
             background-color: #eeeeee;
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
-        <form>
-            <div class="row">
-                <div class="col-xs-4">
-                    <label for="lblCurrentHandle">Handle:</label>
-                </div>
-                <div class="col-xs-4">
-                    <label id="lblCurrentHandle"></label> 
-                </div>
+        <div class="row">
+            <div class="col-xs-4">
+                <label for="lblCurrentHandle">Handle:</label>
             </div>
+            <div class="col-xs-4">
+                <label id="lblCurrentHandle"></label> 
             </div>
-            <div class="row">
-                <div class="form-group col-xs-12">
-                    <input type="text"
-                           class="form-control"
-                           id="txtHandle"
-                           placeholder="New Handle"
-                           autocomplete="off" />
-                </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-xs-12">
+                <input type="text"
+                       class="form-control"
+                       id="txtHandle"
+                       placeholder="New Handle"
+                       autocomplete="off" />
             </div>
-            <button id="btnApply" class="btn btn-default">Apply</button>
-        </form>
+        </div>
+        <button id="btnApply" class="btn btn-default">Apply</button>
     </div>
 </body>
 </html>

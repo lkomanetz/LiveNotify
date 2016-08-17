@@ -18,7 +18,7 @@ setTimeout(main, 3000);
 function main() {
     getCurrentHandle();
     processor = new MessageProcessor();
-    
+
     intervalHandle = setInterval(function() {
         var messages = getChatMessages();
         processor.process(messages);

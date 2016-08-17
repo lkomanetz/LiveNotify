@@ -1,4 +1,3 @@
-
 /*
  * Registers the page action only for a tab that has "livestream" in the URL
  */
