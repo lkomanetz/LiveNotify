@@ -15,3 +15,10 @@ chrome.runtime.onInstalled.addListener(function() {
         }]);
     });
 });
+
+chrome.runtime.onStartup.addListener(function() {
+    chrome.storage.sync.get("liveNotifyHandle", function(storageItem) {
+        var handle = storageItem.liveNotifyHandle.toLowerCase();
+        chrome.storage.sync.set({"liveNotifyHandle": handle}, undefined);
+    });
+});

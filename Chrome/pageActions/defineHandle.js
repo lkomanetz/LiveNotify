@@ -36,7 +36,7 @@
         else {
             btnApply.disabled = true;
         }
-        evt.currentTarget.value = currentText;
+        evt.currentTarget.value = currentText.toLowerCase();
     }
 
     function saveHandle() {

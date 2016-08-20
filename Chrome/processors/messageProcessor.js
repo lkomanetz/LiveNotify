@@ -1,7 +1,6 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
     this.lastProcessedMessage = null;
-    this.isMatch = function(match, userHandle) { return match.toLowerCase() === userHandle.toLowerCase(); };
     
     this.findIndexOf = function(msg, nodes) {
         if (msg == null) {
@@ -67,9 +66,7 @@ MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
         content: message.getElementsByClassName("content")[0].innerText
     };
     
-    chrome.runtime.sendMessage({shoulderTap: shoulderTap}, function(response) {
-        // console.log(response.detail);
-    });
+    chrome.runtime.sendMessage({shoulderTap: shoulderTap}, undefined);
 };
 
 MessageProcessor.prototype.highlightShoulderTaps = function(message) {
@@ -79,7 +76,8 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
         var elem = match;
         var matchWithoutSymbol = match.replace("@", "");
         
-        if (processorContext.isMatch(matchWithoutSymbol, userHandle)) {
+        console.log(userHandle);
+        if (matchWithoutSymbol.toLowerCase() === userHandle) {
             elem = "<span class='label label-danger'>" + match + "</span>";
             processorContext.sendShoulderTappedEvent(message);
         }
