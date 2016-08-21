@@ -4,8 +4,14 @@
     var txtHandle = null;
 
     document.addEventListener("DOMContentLoaded", defineHandle_WindowLoaded);
-
+    
     function defineHandle_WindowLoaded() {
+        $("#dialogForm").dialog({
+            autoOpen: true,
+            height: 200,
+            width: 300,
+            modal: true
+        });
         btnApply = document.getElementById("btnApply");
         lblCurrentHandle = document.getElementById("lblCurrentHandle");
         txtHandle = document.getElementById("txtHandle");
@@ -29,7 +35,8 @@
     }
 
     function txtHandle_TextChanged(evt) {
-        var currentText = evt.currentTarget.value.replace(/[^\w]+/g, "");
+        var nonAlphaNumericRegex = /[^\w]+/g;
+        var currentText = evt.currentTarget.value.replace(nonAlphaNumericRegex, "");
         if (currentText !== "") {
             btnApply.disabled = false;
         }

@@ -13,6 +13,7 @@ window.onunload = function() {
     highlightedMessages = [];
 }
 
+// I'm waiting three seconds to make sure the dynamic HTML has loaded properly.
 setTimeout(main, 3000);
 
 function main() {
@@ -21,13 +22,22 @@ function main() {
 
     intervalHandle = setInterval(function() {
         var messages = getChatMessages();
-        processor.process(messages);
+        
+        if (messages) {
+            processor.process(messages);
+        }
     }, intervalTime);
     listenForStorageChanges();
 }
 
 function getChatMessages() {
-    return document.getElementById("chat_messages").childNodes;
+    var messagesElement = document.getElementById("chat_messages");
+    if (messagesElement !== null) {
+        return document.getElementById("chat_messages").childNodes;
+    }
+    else {
+        return null;
+    }
 }
 
 function getCurrentHandle() {
