@@ -1,7 +1,7 @@
 var intervalTime = 1000; // 1 second
 var cleanupIntervalTime = 1000; // 1 second
 var maxTimeoutThresholdInHours = 1; 
-var userHandle = "";
+var userHandles = "";
 var highlightedMessages = [];
 var intervalHandle = null;
 var messageProcessor = null;
@@ -41,16 +41,16 @@ function getChatMessages() {
 }
 
 function getCurrentHandle() {
-    chrome.storage.sync.get("liveNotifyHandle", function(storageItem) {
-        userHandle = storageItem.liveNotifyHandle;
+    chrome.storage.sync.get("liveNotifyHandles", function(storageItem) {
+        userHandles = storageItem.liveNotifyHandles;
     });
 }
 
 function listenForStorageChanges() {
     chrome.storage.onChanged.addListener(function(changes, namespace) {
         for (var key in changes) {
-            if (key === "liveNotifyHandle") {
-                userHandle = changes[key].newValue;
+            if (key === "liveNotifyHandles") {
+                userHandles = changes[key].newValue;
             }
         }
     });

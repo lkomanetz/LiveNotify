@@ -72,13 +72,17 @@ MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
 MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     var messageContent = message.getElementsByClassName("content")[0];
     var processorContext = this;
+    var isShoulderTapped = false;
+    
     var newHtml = message.innerHTML.replace(processorContext.shoulderTapRegex, function(match) {
         var elem = match;
         var matchWithoutSymbol = match.replace("@", "");
         
-        if (matchWithoutSymbol.toLowerCase() === userHandle.toLowerCase()) {
-            elem = "<span class='label label-danger'>" + match + "</span>";
-            processorContext.sendShoulderTappedEvent(message);
+        for (var i = 0; i < userHandles.length; i++) {
+            if (matchWithoutSymbol.toLowerCase() === userHandles[i].toLowerCase()) {
+                isShoulderTapped = true;
+                elem = "<span class='label label-danger'>" + match + "</span>";
+            }
         }
 
         return elem;
@@ -91,4 +95,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     };
     
     window.highlightedMessages.push(msg);
+    if (isShoulderTapped) {
+        this.sendShoulderTappedEvent(message);
+    }
 };

@@ -1,31 +1,28 @@
 (function() {
     var btnApply = null;
-    var lblCurrentHandle = null;
     var txtHandle = null;
+    var lstHandles = null;
+    var handles = [];
 
     document.addEventListener("DOMContentLoaded", defineHandle_WindowLoaded);
     
     function defineHandle_WindowLoaded() {
         btnApply = document.getElementById("btnApply");
-        lblCurrentHandle = document.getElementById("lblCurrentHandle");
         txtHandle = document.getElementById("txtHandle");
+        lstHandles = document.getElementById("lstHandles");
 
         btnApply.addEventListener("click", btnApply_Clicked);
         txtHandle.addEventListener("input", txtHandle_TextChanged);
 
-        chrome.storage.sync.get("liveNotifyHandle", function (storageItem) {
-            if (storageItem.liveNotifyHandle !== undefined) {
-                lblCurrentHandle.innerText = "@" + storageItem.liveNotifyHandle;
-            }
-            else {
-                lblCurrentHandle.innerText = storageItem.liveNotifyHandle;
+        chrome.storage.sync.get("liveNotifyHandles", function (storageItem) {
+            for (var i = 0; i < storageItem.liveNotifyHandles.length; i++){
+                addHandleToList(storageItem.liveNotifyHandles[i]);
             }
         });
     }
 
     function btnApply_Clicked() {
-        lblCurrentHandle.innerText = "@" + txtHandle.value;
-        saveHandle();
+        addHandleToList(txtHandle.value);
     }
 
     function txtHandle_TextChanged(evt) {
@@ -41,7 +38,47 @@
     }
 
     function saveHandle() {
-        var currentHandle = lblCurrentHandle.innerText.replace("@", "");
-        chrome.storage.sync.set({"liveNotifyHandle": currentHandle}, function () {});
+        chrome.storage.sync.set({"liveNotifyHandles": handles}, function () {
+            txtHandle.value = "";
+        });
     }
+    
+    function addHandleToList(handle) {
+        var listItem = document.createElement("li");
+        listItem.className += "list-group-item";
+        listItem.setAttribute("id", "li_" + handle);
+        
+        var removeBtn = document.createElement("button");
+        removeBtn.className += "btn btn-default btn-sm";
+        removeBtn.innerHTML = "<span class='glyphicon glyphicon-remove'></span>";
+        removeBtn.onclick = function() {
+            removeHandleFromList(handle, listItem.getAttribute("id"));
+        };
+        
+        var handleSpan = document.createElement("label");
+        handleSpan.innerText = "@" + handle;
+        
+        listItem.appendChild(handleSpan);
+        listItem.appendChild(removeBtn);
+        
+        lstHandles.appendChild(listItem);
+        handles.push(handle);
+        
+        saveHandle();
+    }
+    
+    function removeHandleFromList(handle, listItemId) {
+        var itemToRemove = document.getElementById(listItemId);
+        var parent = document.getElementById("lstHandles");
+        
+        parent.removeChild(itemToRemove);
+        
+        var index = handles.indexOf(handle);
+        if (index > -1) {
+            handles.splice(index, 1);
+        }
+        
+        saveHandle();
+    }
+    
 })();
