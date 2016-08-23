@@ -6,12 +6,6 @@
     document.addEventListener("DOMContentLoaded", defineHandle_WindowLoaded);
     
     function defineHandle_WindowLoaded() {
-        $("#dialogForm").dialog({
-            autoOpen: true,
-            height: 200,
-            width: 300,
-            modal: true
-        });
         btnApply = document.getElementById("btnApply");
         lblCurrentHandle = document.getElementById("lblCurrentHandle");
         txtHandle = document.getElementById("txtHandle");

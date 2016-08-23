@@ -76,8 +76,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
         var elem = match;
         var matchWithoutSymbol = match.replace("@", "");
         
-        console.log(userHandle);
-        if (matchWithoutSymbol.toLowerCase() === userHandle) {
+        if (matchWithoutSymbol.toLowerCase() === userHandle.toLowerCase()) {
             elem = "<span class='label label-danger'>" + match + "</span>";
             processorContext.sendShoulderTappedEvent(message);
         }
