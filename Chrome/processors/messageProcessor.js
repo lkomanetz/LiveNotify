@@ -72,6 +72,7 @@ MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
 MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     var messageContent = message.getElementsByClassName("content")[0];
     var processorContext = this;
+    var userHandlesInMessage = [];
     
     var newHtml = message.innerHTML.replace(processorContext.shoulderTapRegex, function(match) {
         var elem = match;
@@ -80,6 +81,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
         for (var i = 0; i < userHandles.length; i++) {
             if (matchWithoutSymbol.toLowerCase() === userHandles[i].toLowerCase()) {
                 elem = "<span class='label label-danger'>" + match + "</span>";
+                userHandlesInMessage.push(matchWithoutSymbol);
             }
         }
 
@@ -92,6 +94,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
         sentOn: new Date(message.getElementsByClassName("timeago")[0].title)
     };
     
-    window.highlightedMessages.push(msg);
-	this.sendShoulderTappedEvent(message);
+    if (userHandlesInMessage.length > 0) {
+        this.sendShoulderTappedEvent(message);
+    }
 };
