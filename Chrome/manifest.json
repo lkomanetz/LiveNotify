@@ -2,7 +2,7 @@
 	"manifest_version": 2,
     "name": "LiveNotify",
     "description": "Sends desktop notifications when somebody mentions you during Livestream chat.",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "permissions": [
         "notifications",
         "storage",
