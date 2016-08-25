@@ -12,14 +12,16 @@ var notificationService = (function() {
             chrome.notifications.create(newId, {
                 type: "basic",
                 iconUrl: "icons/exclamation_point.ico",
-                title: "LiveNotify",
-                message: request.shoulderTap.sentBy + " just tapped you.",
-                isClickable: true
+                title: request.shoulderTap.sentBy + " just tapped you.",
+                message: request.shoulderTap.content,
+                buttons: [{
+                    title: "View"
+                }]
             });
         });
     });
     
-    chrome.notifications.onClicked.addListener(function(notificationId) {
+    chrome.notifications.onButtonClicked.addListener(function(notificationId) {
         doWithLivestreamWindow(function(windowId, tabId) {
             openLivestream(windowId, tabId);
             clearNotificationFromScreen(notificationId);

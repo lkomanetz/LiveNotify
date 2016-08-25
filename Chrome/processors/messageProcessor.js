@@ -63,7 +63,7 @@ MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
     var shoulderTap = {
         sentBy: message.getElementsByClassName("user_link")[0].title,
         sentOn: new Date(message.getElementsByClassName("timeago")[0].title),
-        content: message.getElementsByClassName("content")[0].innerText
+        content: this.trimMessageContent(message.getElementsByClassName("content")[0].innerText)
     };
     
     chrome.runtime.sendMessage({shoulderTap: shoulderTap}, undefined);
@@ -97,4 +97,11 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     if (userHandlesInMessage.length > 0) {
         this.sendShoulderTappedEvent(message);
     }
+};
+
+MessageProcessor.prototype.trimMessageContent = function(messageContent) {
+    var newContent = messageContent.replace(/[\r|\n].+/, "");
+    
+    // \u2013 and \u2014 searches for HTML ndash and mdash
+    return newContent.replace(/^[A-Za-z0-9_\s\-\.]+\s*[\u2013|\u2014]\s*/, "");
 };
