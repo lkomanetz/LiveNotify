@@ -92,7 +92,7 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     message.innerHTML = newHtml;
     
     if (userHandlesInMessage.length > 0) {
-        // this.sendShoulderTappedEvent(message);
+        this.sendShoulderTappedEvent(message);
     }
 };
 
