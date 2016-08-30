@@ -19,6 +19,8 @@ setTimeout(main, 3000);
 function main() {
     var iframeDoc = document.getElementById("liveChatContainer");
     chatDoc = iframeDoc.contentDocument || iframeDoc.contentWindow.document;
+    
+    addCssToHead(chatDoc);
     getCurrentHandle();
     messageProcessor = new MessageProcessor();
 
@@ -56,4 +58,13 @@ function listenForStorageChanges() {
             }
         }
     });
+}
+
+function addCssToHead(iframeDoc) {
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = chrome.extension.getURL("css/liveNotify.css");
+    
+    iframeDoc.head.appendChild(link);
 }

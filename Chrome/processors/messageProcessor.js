@@ -35,7 +35,7 @@ MessageProcessor.prototype.process = function(messages) {
      * I'm wanting to process the messages in reverse order.  This means messages get processed
      * from bottom to top instead of top to bottom because of the way LiveStream's chat is setup.
      */
-    for (var i = index; i < messages.length; i++) {
+    for (var i = index + 1; i < messages.length; i++) {
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
@@ -65,7 +65,6 @@ MessageProcessor.prototype.hasShoulderTaps = function(message) {
 MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
     var shoulderTap = {
         sentBy: message.getElementsByClassName(this.commenterNameClassName)[0].innerText,
-        sentOn: new Date(message.getElementsByClassName("timeago")[0].title),
         content: this.trimMessageContent(message.getElementsByClassName(this.messageContentClassName)[0].innerText)
     };
     
@@ -92,14 +91,8 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     });
     message.innerHTML = newHtml;
     
-    var msg = {
-        sentBy: message.getElementsByClassName(this.commenterNameClassName)[0].innerText,
-        sentOn: new Date(message.getElementsByClassName("timeago")[0].title)
-    };
-    
     if (userHandlesInMessage.length > 0) {
-        console.log(userHandlesInMessage);
-        this.sendShoulderTappedEvent(message);
+        // this.sendShoulderTappedEvent(message);
     }
 };
 
