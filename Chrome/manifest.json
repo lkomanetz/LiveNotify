@@ -20,6 +20,9 @@
             "services/notificationService.js"
         ]
     },
+    "web_accessible_resources": [
+        "css/liveNotify.css"
+    ],
     "content_scripts": [{
         "matches": ["*://*.livestream.com/*"],
         "js": [
