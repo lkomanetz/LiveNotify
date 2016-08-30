@@ -1,9 +1,11 @@
 var intervalTime = 1000; // 1 second
 var cleanupIntervalTime = 1000; // 1 second
 var maxTimeoutThresholdInHours = 1; 
-var userHandles = "";
+var userHandles = [];
 var intervalHandle = null;
 var messageProcessor = null;
+var commentClassName = "comment ng-scope";
+var chatDoc = null;
 
 window.onunload = function() {
     clearInterval(intervalHandle);
@@ -15,6 +17,8 @@ window.onunload = function() {
 setTimeout(main, 3000);
 
 function main() {
+    var iframeDoc = document.getElementById("liveChatContainer");
+    chatDoc = iframeDoc.contentDocument || iframeDoc.contentWindow.document;
     getCurrentHandle();
     messageProcessor = new MessageProcessor();
 
@@ -29,9 +33,9 @@ function main() {
 }
 
 function getChatMessages() {
-    var messagesElement = document.getElementById("chat_messages");
-    if (messagesElement !== null) {
-        return document.getElementById("chat_messages").childNodes;
+    var comments = chatDoc.getElementsByClassName("comment ng-scope");
+    if (comments.length !== 0) {
+        return comments;
     }
     else {
         return null;

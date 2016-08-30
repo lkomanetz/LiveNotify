@@ -1,6 +1,8 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
     this.lastProcessedMessage = null;
+    this.messageContentClassName = "commenter_content ng-binding";
+    this.commenterNameClassName = "commenter_name ng-binding";
     
     this.findIndexOf = function(msg, nodes) {
         if (msg == null) {
@@ -8,16 +10,17 @@ var MessageProcessor = function() {
         }
         
         for (var i = 0; i < nodes.length; i++) {
-            var sentBy = nodes[i].getElementsByClassName("user_link")[0].title;
-            var sentOn = new Date(nodes[i].getElementsByClassName("timeago")[0].title);
+            var sentBy = nodes[i].getElementsByClassName(this.commenterNameClassName)[0].innerText;
+            var content = nodes[i].getElementsByClassName(this.messageContentClassName)[0].innerText;
             
             if (msg.sentBy === sentBy &&
-               msg.sentOn.getTime() === sentOn.getTime()) {
+               msg.content === content) {
                 
                 return i;
             }
         }
         
+        console.log("Couldn't find message " + msg);
         return -1;
     };
 }
@@ -25,27 +28,27 @@ var MessageProcessor = function() {
 MessageProcessor.prototype.process = function(messages) {
     var index = this.findIndexOf(this.lastProcessedMessage, messages);
     if (index === -1) {
-        index = messages.length;
+        index = 0;
     }
     
     /*
      * I'm wanting to process the messages in reverse order.  This means messages get processed
      * from bottom to top instead of top to bottom because of the way LiveStream's chat is setup.
      */
-    for (var i = index - 1; i >= 0; i--) {
+    for (var i = index; i < messages.length; i++) {
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
         
         this.lastProcessedMessage = {
-            sentBy: messages[i].getElementsByClassName("user_link")[0].title,
-            sentOn: new Date(messages[i].getElementsByClassName("timeago")[0].title)
+            sentBy: messages[i].getElementsByClassName(this.commenterNameClassName)[0].innerText,
+            content: messages[i].getElementsByClassName(this.messageContentClassName)[0].innerText
         };
     }
 };
 
 MessageProcessor.prototype.hasShoulderTaps = function(message) {
-    var messageContent = message.getElementsByClassName("content")[0];
+    var messageContent = message.getElementsByClassName(this.messageContentClassName)[0];
     var matches = messageContent.innerHTML.match(this.shoulderTapRegex);
     
     if (matches == null ||
@@ -61,16 +64,16 @@ MessageProcessor.prototype.hasShoulderTaps = function(message) {
 
 MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
     var shoulderTap = {
-        sentBy: message.getElementsByClassName("user_link")[0].title,
+        sentBy: message.getElementsByClassName(this.commenterNameClassName)[0].innerText,
         sentOn: new Date(message.getElementsByClassName("timeago")[0].title),
-        content: this.trimMessageContent(message.getElementsByClassName("content")[0].innerText)
+        content: this.trimMessageContent(message.getElementsByClassName(this.messageContentClassName)[0].innerText)
     };
     
     chrome.runtime.sendMessage({shoulderTap: shoulderTap}, undefined);
 };
 
 MessageProcessor.prototype.highlightShoulderTaps = function(message) {
-    var messageContent = message.getElementsByClassName("content")[0];
+    var messageContent = message.getElementsByClassName(this.messageContentClassName)[0];
     var processorContext = this;
     var userHandlesInMessage = [];
     
@@ -90,11 +93,12 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     message.innerHTML = newHtml;
     
     var msg = {
-        sentBy: message.getElementsByClassName("user_link")[0].title,
+        sentBy: message.getElementsByClassName(this.commenterNameClassName)[0].innerText,
         sentOn: new Date(message.getElementsByClassName("timeago")[0].title)
     };
     
     if (userHandlesInMessage.length > 0) {
+        console.log(userHandlesInMessage);
         this.sendShoulderTappedEvent(message);
     }
 };
