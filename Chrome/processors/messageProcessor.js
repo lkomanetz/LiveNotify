@@ -27,6 +27,7 @@ var MessageProcessor = function() {
 
 MessageProcessor.prototype.process = function(messages) {
     var index = this.findIndexOf(this.lastProcessedMessage, messages);
+    console.log("Index: " + index);
     if (index === -1) {
         index = 0;
     }
