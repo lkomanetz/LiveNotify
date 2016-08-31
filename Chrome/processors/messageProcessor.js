@@ -1,50 +1,27 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
     this.lastProcessedMessage = null;
+    this.lastProcessedMessageIndex = -1;
     this.messageContentClassName = "commenter_content ng-binding";
     this.commenterNameClassName = "commenter_name ng-binding";
-    
-    this.findIndexOf = function(msg, nodes) {
-        if (msg == null) {
-            return -1;
-        }
-        
-        for (var i = 0; i < nodes.length; i++) {
-            var sentBy = nodes[i].getElementsByClassName(this.commenterNameClassName)[0].innerText;
-            var content = nodes[i].getElementsByClassName(this.messageContentClassName)[0].innerText;
-            
-            if (msg.sentBy === sentBy &&
-               msg.content === content) {
-                
-                return i;
-            }
-        }
-        
-        console.log("Couldn't find message " + msg);
-        return -1;
-    };
 }
 
 MessageProcessor.prototype.process = function(messages) {
-    var index = this.findIndexOf(this.lastProcessedMessage, messages);
-    console.log("Index: " + index);
+    var index = this.lastProcessedMessageIndex;
     if (index === -1) {
         index = 0;
     }
     
     /*
-     * I'm wanting to process the messages in reverse order.  This means messages get processed
-     * from bottom to top instead of top to bottom because of the way LiveStream's chat is setup.
+     * I want to start with the next message starting from the last processed message so I'm not
+     * iterating through the entire message array each time.
      */
     for (var i = index + 1; i < messages.length; i++) {
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
         
-        this.lastProcessedMessage = {
-            sentBy: messages[i].getElementsByClassName(this.commenterNameClassName)[0].innerText,
-            content: messages[i].getElementsByClassName(this.messageContentClassName)[0].innerText
-        };
+        this.lastProcessedMessageIndex = i;
     }
 };
 
