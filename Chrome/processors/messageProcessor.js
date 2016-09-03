@@ -1,7 +1,6 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
-    this.lastProcessedMessage = null;
-    this.lastProcessedMessageIndex = -1;
+    this.lastProcessedId = null;
     this.messageContentClassName = "commenter_content ng-binding";
     this.commenterNameClassName = "commenter_name ng-binding";
     this.processedAttributeName = "processedId";
@@ -16,8 +15,9 @@ MessageProcessor.prototype.createGuid = function() {
 
 MessageProcessor.prototype.process = function(messages) {
     var index = this.findNextIndex(messages);
+    var messagesProcessed = 0;
     if (index === -1) {
-        index = 0;
+        return;
     }
     
     /*
@@ -25,29 +25,31 @@ MessageProcessor.prototype.process = function(messages) {
      * iterating through the entire message array each time.
      */
     for (var i = index; i < messages.length; i++) {
-        messages[i].setAttribute(this.processedAttributeName, this.createGuid());
+        var processedId = this.createGuid();
+        messages[i].setAttribute(this.processedAttributeName, processedId);
         
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
-        
-        this.lastProcessedMessageIndex = i;
-        this.lastProcessedMessage = {
-            sentBy: messages[i].getElementsByClassName(this.commenterNameClassName)[0].innerText,
-            content: messages[i].getElementsByClassName(this.messageContentClassName)[0].innerText
-        };
+        messagesProcessed++;
+        this.lastProcessedId = processedId;
     }
+    
+    console.info("LiveNotify:  Messages Processed=>" + messagesProcessed);
 };
 
 MessageProcessor.prototype.findNextIndex = function(nodes) {
     for (var i = 0; i < nodes.length; i++) {
         var processedId = nodes[i].getAttribute(this.processedAttributeName);
-        if (processedId) {
+        if (processedId == null) {
             return i;
+        }
+        else if (processedId == this.lastProcessedId) {
+            return i + 1;
         }
     }
     
-    return -1;
+    return 0;
 };
 
 MessageProcessor.prototype.hasShoulderTaps = function(message) {
