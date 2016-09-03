@@ -4,10 +4,18 @@ var MessageProcessor = function() {
     this.lastProcessedMessageIndex = -1;
     this.messageContentClassName = "commenter_content ng-binding";
     this.commenterNameClassName = "commenter_name ng-binding";
+    this.processedAttributeName = "processedId";
 }
 
+MessageProcessor.prototype.createGuid = function() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
 MessageProcessor.prototype.process = function(messages) {
-    var index = this.lastProcessedMessageIndex;
+    var index = this.findNextIndex(messages);
     if (index === -1) {
         index = 0;
     }
@@ -16,13 +24,30 @@ MessageProcessor.prototype.process = function(messages) {
      * I want to start with the next message starting from the last processed message so I'm not
      * iterating through the entire message array each time.
      */
-    for (var i = index + 1; i < messages.length; i++) {
+    for (var i = index; i < messages.length; i++) {
+        messages[i].setAttribute(this.processedAttributeName, this.createGuid());
+        
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
         
         this.lastProcessedMessageIndex = i;
+        this.lastProcessedMessage = {
+            sentBy: messages[i].getElementsByClassName(this.commenterNameClassName)[0].innerText,
+            content: messages[i].getElementsByClassName(this.messageContentClassName)[0].innerText
+        };
     }
+};
+
+MessageProcessor.prototype.findNextIndex = function(nodes) {
+    for (var i = 0; i < nodes.length; i++) {
+        var processedId = nodes[i].getAttribute(this.processedAttributeName);
+        if (processedId) {
+            return i;
+        }
+    }
+    
+    return -1;
 };
 
 MessageProcessor.prototype.hasShoulderTaps = function(message) {
