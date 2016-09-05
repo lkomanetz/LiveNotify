@@ -15,7 +15,6 @@ MessageProcessor.prototype.createGuid = function() {
 
 MessageProcessor.prototype.process = function(messages) {
     var index = this.findNextIndex(messages);
-    var messagesProcessed = 0;
     if (index === -1) {
         return;
     }
@@ -34,8 +33,6 @@ MessageProcessor.prototype.process = function(messages) {
         messagesProcessed++;
         this.lastProcessedId = processedId;
     }
-    
-    console.info("LiveNotify:  Messages Processed=>" + messagesProcessed);
 };
 
 MessageProcessor.prototype.findNextIndex = function(nodes) {
@@ -49,7 +46,7 @@ MessageProcessor.prototype.findNextIndex = function(nodes) {
         }
     }
     
-    return 0;
+    return -1;
 };
 
 MessageProcessor.prototype.hasShoulderTaps = function(message) {
