@@ -1,5 +1,6 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
+    this.urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b(.)*/g;
     this.lastProcessedId = null;
     this.messageContentClassName = "commenter_content ng-binding";
     this.commenterNameClassName = "commenter_name ng-binding";
@@ -30,7 +31,11 @@ MessageProcessor.prototype.process = function(messages) {
         if (this.hasShoulderTaps(messages[i])) {
             this.highlightShoulderTaps(messages[i]);
         }
-        messagesProcessed++;
+        
+        if (this.hasLinks(messages[i])) {
+            this.wrapLinks(messages[i]);
+        }
+        
         this.lastProcessedId = processedId;
     }
 };
@@ -64,6 +69,21 @@ MessageProcessor.prototype.hasShoulderTaps = function(message) {
     }
 };
 
+MessageProcessor.prototype.hasLinks = function(message) {
+    var messageContent = message.getElementsByClassName(this.messageContentClassName)[0];
+    var matches = messageContent.innerHTML.match(this.urlRegex);
+    
+    if (matches == null ||
+       matches == "undefined" ||
+       matches.length == 0) {
+        
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 MessageProcessor.prototype.sendShoulderTappedEvent = function(message) {
     var shoulderTap = {
         sentBy: message.getElementsByClassName(this.commenterNameClassName)[0].innerText,
@@ -96,6 +116,19 @@ MessageProcessor.prototype.highlightShoulderTaps = function(message) {
     if (userHandlesInMessage.length > 0) {
         this.sendShoulderTappedEvent(message);
     }
+};
+
+MessageProcessor.prototype.wrapLinks = function(message) {
+    var messageContent = message.getElementsByClassName(this.messageContentClassName)[0];
+    var processorContext = this;
+    
+    var newHtml = message.innerHTML.replace(processorContext.urlRegex, function(match) {
+        console.log(match);
+        var newText = "<a target='_blank' href='" + match + "'>" + match +"</a>";
+        return newText;
+    });
+    
+    message.innerHTML = newHtml;
 };
 
 MessageProcessor.prototype.trimMessageContent = function(messageContent) {
