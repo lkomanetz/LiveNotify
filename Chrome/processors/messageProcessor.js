@@ -1,6 +1,6 @@
 var MessageProcessor = function() {
     this.shoulderTapRegex = /@([A-Za-z0-9_]+)/g;
-    this.urlRegex = /^(http(s)?(:\/\/))?(www\.)?[\w_\.]+([-a-zA-Z0-9:%_\+.~#?&\/=]*)/g;
+    this.urlRegex = /^(http(s)?(:\/\/))?(www\.)?[\w_\.]+([-a-zA-Z0-9:%_\+.~!#?&\/=]*)/g;
     this.lastProcessedId = null;
     this.messageContentClassName = "commenter_content ng-binding";
     this.commenterNameClassName = "commenter_name ng-binding";
